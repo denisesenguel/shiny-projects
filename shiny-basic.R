@@ -1,5 +1,6 @@
 rm(list = ls())
 library(shiny)
+library(plotly)
 library(data.table)
 library(dplyr)
 library(rworldmap)
@@ -14,12 +15,12 @@ library(rworldmap)
   colnames(asylumData)[1] <- "Country"
   # have to change some country names
   # what is the difference between the two USA entries?
+  # the same has to be done for the country of origin
   asylumData$Country[grepl("+United Kingdom", asylumData$Country)] <- "United Kingdom"
   asylumData$Country[grepl("Macedonia", asylumData$Country)] <- "Macedonia"
   asylumData$Country[grepl("Serbia", asylumData$Country)] <- "Serbia and Kosovo"
-  # next: merge country population
-  # find out how to map country data using rworldmap
-  
+  # next: import and merge country population
+  popData <- readLines("data/worldbank_populations.csv", warn = F)  
 # summarize by year and country (only for basic viz)
   asylumSumData <- asylumData %>%
     group_by(Country, Year) %>%
@@ -29,18 +30,22 @@ library(rworldmap)
 # Define the UI 
   shinyUI <- fluidPage(
     
-    titlePanel("Total Asylum Seekers by Year and Country"),
+    titlePanel("Number of Asylum Seekers by Year and Country"),
     sidebarPanel(selectInput("Country", "Choose a country:", 
                              choices = unique(asylumSumData$Country))),
-    plotOutput("basicPlot")
+    plotlyOutput("basicPlot")
   )
   
 # Define shiny server code
   shinyServer <- function(input, output) {
-    output$basicPlot <- renderPlot({
-      plot(subset(asylumSumData, Country == input$Country)$Year, 
-           subset(asylumSumData, Country == input$Country)$Total, type = "p",
-           xlab = "Years", ylab = "Total Number of Asylum Seekers", main = "Basic Plot")
+    output$basicPlot <- renderPlotly({
+      p <- plot_ly(data = asylumSumData[Country == input$Country, ], 
+                   x    = Year, 
+                   y    = Total, 
+                   type = "p")
+      layout(p, 
+             xaxis = list(title = "Year"), 
+             yaxis = list(title = "Total Number of Registered Asylum Seekers"))
       })
   }
   
