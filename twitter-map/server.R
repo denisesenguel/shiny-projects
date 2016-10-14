@@ -5,8 +5,6 @@
 # http://shiny.rstudio.com
 #
 
-library(shiny)
-
 # get map info
 data("countryExData", envir = environment(), package = "rworldmap")
 mymap <- joinCountryData2Map(countryExData, 
@@ -20,7 +18,7 @@ shinyServer <- function(input, output) {
     # get data based on input$time:
     # mit dem date gibts noch ein problem!!
     # wie kann man das wieder zurück konvertieren? oder einfach die lhs konvertieren?
-    dataSub <- dplyr::filter(tweetsClean, as.numeric(as.Date(created_at)) == input$time)
+    dataSub <- dplyr::filter(tweetsClean, created_at == input$time)
     
     # draw plot
     ggplot() + 

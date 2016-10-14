@@ -4,9 +4,6 @@
 #
 # http://shiny.rstudio.com
 #
-
-library(shiny)
-
 shinyUI <- shinyUI(fluidPage(
 
   # Application title
@@ -19,10 +16,10 @@ shinyUI <- shinyUI(fluidPage(
   fluidRow(align = "center",
     sliderInput("time",
                 "Select a day",
-                min = as.numeric(as.Date(min(tweetsClean$created_at))),
-                max = as.numeric(as.Date(max(tweetsClean$created_at))),
-                value = as.numeric(as.Date(min(tweetsClean$created_at))))
-  )
-  
+                min = as.Date(min(tweetsClean$created_at)),
+                max = as.Date(max(tweetsClean$created_at)),
+                value = as.Date(min(tweetsClean$created_at)),
+                animate = animationOptions())
+                )
 
 ))
